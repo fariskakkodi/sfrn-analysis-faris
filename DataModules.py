@@ -23,13 +23,18 @@ class SequenceDataset(Dataset):
 
                     identifier = str(row["TaskPrompt"]).strip() if "TaskPrompt" in row and row["TaskPrompt"] else "NA"
 
+                    # store university and question for output file
+                    university = str(row["UNIV"]).strip() if "UNIV" in row and row["UNIV"] else "NA"
+
                     line = CLS_TOKEN + student_answer + SEP_TOKEN + reference_answer + SEP_TOKEN + question_text
 
                     self.label_set.add(label)
                     self.data_dict.append({
                         "label": label,
                         "line": line,
-                        "identifier": identifier
+                        "identifier": identifier,
+                        "question": question_text,
+                        "university": university,
                     })
 
         print(self.tag2id)
@@ -43,6 +48,8 @@ class SequenceDataset(Dataset):
         label = self.tag2id[item["label"]]
         line = item["line"]
         identifier = item["identifier"]
+        question = item["question"]
+        university = item["university"]
 
         tokenized_data = self.tokenizer(
             line,
@@ -59,6 +66,8 @@ class SequenceDataset(Dataset):
             "attention_mask": torch.tensor(attention_mask, dtype=torch.long),
             "label": torch.tensor(label, dtype=torch.long),
             "identifier": identifier,
+            "question": question,
+            "university": university,
         }
 
     def get_category_distribution(self):
