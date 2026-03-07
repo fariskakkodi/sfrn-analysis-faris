@@ -12,15 +12,16 @@ YituTech/conv-bert-base
 #TRAIN_FILE_PATH = ['./data/debug.csv']
 #TEST_FILE_PATH = ['./data/debug.csv']
 
-TRAIN_FILE_PATH = ['./data/traindev_set.csv']
-TEST_FILE_PATH = ['./data/test_set.csv']
+TRAIN_FILE_PATH = ['./data/train_new_data.csv']
+TEST_FILE_PATH = ['./data/test_new_data.csv']
+VAL_FILE_PATH = ['./data/validation_new_data.csv']
 
 ### CHANGE: added path to istudio_dict_init.py ###
 ISTUDIO_DATA_DICTS = ['./data/smk6961/ASAG/istudio_dict_init.py']
 SEP_TOKEN = '[SEP]'
 CLS_TOKEN = '[CLS]'
 
-TAG2ID = {'0': 0, '1': 1, '2': 2, '3': 3}
+TAG2ID = {'0': 0, '1': 1, '2': 2}
 
 hyperparameters = dict(
     train_id="0204_IS_SFRN_pretrain_model",
