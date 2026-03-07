@@ -6,9 +6,8 @@ from tqdm.auto import tqdm
 import numpy as np
 import torch
 import torch.nn as nn
-from transformers import AutoModelForSequenceClassification
 from torch.utils.data import DataLoader, SubsetRandomSampler
-from transformers import AutoTokenizer, get_linear_schedule_with_warmup, AutoConfig
+from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score
 from sklearn.metrics import cohen_kappa_score
 from torch.optim import AdamW
@@ -46,30 +45,12 @@ def train(args):
     val_dataset.tag2id = train_dataset.tag2id
     test_dataset.tag2id = train_dataset.tag2id
 
-    # split the training dataset into training and validation
-    #trainset_size = len(train_dataset)
-    #validation_split = hyperparameters['data_split']
-    #indices = list(range(trainset_size))
-    #split = int(np.floor(validation_split * trainset_size))
-    #if hyperparameters['shuffle_dataset']:
-    #    np.random.shuffle(indices)
-    #train_indices, val_indices = indices[split:], indices[:split]
-
-    # create data loaders for training, validation, and testing
-    #train_sampler = SubsetRandomSampler(train_indices)
-    #validation_sampler = SubsetRandomSampler(val_indices)
-    #train_loader = DataLoader(train_dataset, batch_size=1, sampler=train_sampler)
-    #val_loader = DataLoader(train_dataset, batch_size=1, sampler=validation_sampler)
-    #test_loader = DataLoader(test_dataset, batch_size=1)
-
-
-    #val_dataset = SequenceDataset(VAL_FILE_PATH, tokenizer, DEVICE)
     train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
-    # initialize the model, optimizer, loss function, and scheduler
-    model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=hyperparameters['num_labels'])
+    # FIX: initialize SFRNModel instead of AutoModelForSequenceClassification
+    model = SFRNModel()
     model.to(DEVICE)
     optimizer = AdamW(model.parameters(), lr=hyperparameters['lr'], weight_decay=hyperparameters['weight_decay'])
     criterion = nn.CrossEntropyLoss()
@@ -79,6 +60,7 @@ def train(args):
 
     # main training loop
     for epoch in range(hyperparameters['epochs']):
+        model.train()
         train_loss = 0.0
         y_true, y_pred, identifiers = [], [], []  # trackers for metrics
         train_iterator = tqdm(train_loader, desc="Train Iteration")  # progress bar
@@ -90,9 +72,9 @@ def train(args):
             labels = batch["label"].to(DEVICE)
             identifiers.extend(batch["identifier"])
 
-            # forward pass and calculate loss
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            logits, loss = outputs.logits, outputs.loss
+            # FIX: SFRNModel returns logits directly, compute loss manually
+            logits = model(input_ids, attention_mask=attention_mask)
+            loss = criterion(logits, labels)
             loss.backward()
 
             # track loss and predictions
@@ -121,12 +103,14 @@ def train(args):
         val_iterator = tqdm(val_loader, desc="Validation Iteration")
         with torch.no_grad():
             for step, batch in enumerate(val_iterator):
-                # forward pass for validation data
+                # extract input and labels from the batch
                 input_ids = batch["input_ids"].to(DEVICE)
                 attention_mask = batch["attention_mask"].to(DEVICE)
                 labels = batch["label"].to(DEVICE)
-                outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-                logits, loss = outputs.logits, outputs.loss
+
+                # FIX: SFRNModel returns logits directly, compute loss manually
+                logits = model(input_ids, attention_mask=attention_mask)
+                loss = criterion(logits, labels)
                 val_loss += loss.item()
                 pred_idx = torch.argmax(logits, dim=1)
                 val_y_true.extend(labels.cpu().numpy())
@@ -157,8 +141,9 @@ def train(args):
                 input_ids = batch["input_ids"].to(DEVICE)
                 attention_mask = batch["attention_mask"].to(DEVICE)
                 labels = batch["label"].to(DEVICE)
-                outputs = model(input_ids, attention_mask=attention_mask)
-                logits = outputs.logits
+
+                # FIX: SFRNModel returns logits directly
+                logits = model(input_ids, attention_mask=attention_mask)
                 pred_idx = torch.argmax(logits, dim=1)
                 test_y_true.extend(labels.cpu().numpy())
                 test_y_pred.extend(pred_idx.cpu().numpy())
