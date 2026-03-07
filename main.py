@@ -21,7 +21,7 @@ best_ckp_path = None  # global variable for saving the best checkpoint path
 
 def train(args):
     # define the directory for saving checkpoints
-    checkpoint_dir = '/data/smk6961/ASAG/checkpoint'
+    checkpoint_dir = './checkpoints'
 
     # set a random seed for reproducibility
     random.seed(hyperparameters['random_seed'])
