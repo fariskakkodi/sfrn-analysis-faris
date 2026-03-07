@@ -63,7 +63,7 @@ def train(args):
     #test_loader = DataLoader(test_dataset, batch_size=1)
 
 
-    val_dataset = SequenceDataset(VAL_FILE_PATH, tokenizer, DEVICE)
+    #val_dataset = SequenceDataset(VAL_FILE_PATH, tokenizer, DEVICE)
     train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
@@ -148,7 +148,7 @@ def train(args):
 
     # testing the best model
     if best_ckp_path:
-        model.load_state_dict(torch.load(best_ckp_path))
+        model.load_state_dict(torch.load(best_ckp_path, map_location=DEVICE))
         model.eval()
         test_y_true, test_y_pred = [], []
         test_iterator = tqdm(test_loader, desc="Test Iteration")
