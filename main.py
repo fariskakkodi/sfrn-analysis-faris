@@ -40,24 +40,33 @@ def train(args):
 
     # load the training and testing datasets
     train_dataset = SequenceDataset(TRAIN_FILE_PATH, tokenizer, DEVICE)
+    val_dataset = SequenceDataset(VAL_FILE_PATH, tokenizer, DEVICE)
     test_dataset = SequenceDataset(TEST_FILE_PATH, tokenizer, DEVICE)
-    test_dataset.tag2id = train_dataset.tag2id  # align label mappings between datasets
+
+    val_dataset.tag2id = train_dataset.tag2id
+    test_dataset.tag2id = train_dataset.tag2id
 
     # split the training dataset into training and validation
-    trainset_size = len(train_dataset)
-    validation_split = hyperparameters['data_split']
-    indices = list(range(trainset_size))
-    split = int(np.floor(validation_split * trainset_size))
-    if hyperparameters['shuffle_dataset']:
-        np.random.shuffle(indices)
-    train_indices, val_indices = indices[split:], indices[:split]
+    #trainset_size = len(train_dataset)
+    #validation_split = hyperparameters['data_split']
+    #indices = list(range(trainset_size))
+    #split = int(np.floor(validation_split * trainset_size))
+    #if hyperparameters['shuffle_dataset']:
+    #    np.random.shuffle(indices)
+    #train_indices, val_indices = indices[split:], indices[:split]
 
     # create data loaders for training, validation, and testing
-    train_sampler = SubsetRandomSampler(train_indices)
-    validation_sampler = SubsetRandomSampler(val_indices)
-    train_loader = DataLoader(train_dataset, batch_size=1, sampler=train_sampler)
-    val_loader = DataLoader(train_dataset, batch_size=1, sampler=validation_sampler)
-    test_loader = DataLoader(test_dataset, batch_size=1)
+    #train_sampler = SubsetRandomSampler(train_indices)
+    #validation_sampler = SubsetRandomSampler(val_indices)
+    #train_loader = DataLoader(train_dataset, batch_size=1, sampler=train_sampler)
+    #val_loader = DataLoader(train_dataset, batch_size=1, sampler=validation_sampler)
+    #test_loader = DataLoader(test_dataset, batch_size=1)
+
+
+    val_dataset = SequenceDataset(VAL_FILE_PATH, tokenizer, DEVICE)
+    train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
     # initialize the model, optimizer, loss function, and scheduler
     model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=hyperparameters['num_labels'])
@@ -76,8 +85,8 @@ def train(args):
 
         for step, batch in enumerate(train_iterator):
             # extract input and labels from the batch
-            input_ids = batch["input_ids"][:, 0, :].to(DEVICE)
-            attention_mask = batch["attention_mask"][:, 0, :].to(DEVICE)
+            input_ids = batch["input_ids"].to(DEVICE)
+            attention_mask = batch["attention_mask"].to(DEVICE)
             labels = batch["label"].to(DEVICE)
             identifiers.extend(batch["identifier"])
 
@@ -113,8 +122,8 @@ def train(args):
         with torch.no_grad():
             for step, batch in enumerate(val_iterator):
                 # forward pass for validation data
-                input_ids = batch["input_ids"][:, 0, :].to(DEVICE)
-                attention_mask = batch["attention_mask"][:, 0, :].to(DEVICE)
+                input_ids = batch["input_ids"].to(DEVICE)
+                attention_mask = batch["attention_mask"].to(DEVICE)
                 labels = batch["label"].to(DEVICE)
                 outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
                 logits, loss = outputs.logits, outputs.loss
@@ -145,8 +154,8 @@ def train(args):
         test_iterator = tqdm(test_loader, desc="Test Iteration")
         with torch.no_grad():
             for batch in test_iterator:
-                input_ids = batch["input_ids"][:, 0, :].to(DEVICE)
-                attention_mask = batch["attention_mask"][:, 0, :].to(DEVICE)
+                input_ids = batch["input_ids"].to(DEVICE)
+                attention_mask = batch["attention_mask"].to(DEVICE)
                 labels = batch["label"].to(DEVICE)
                 outputs = model(input_ids, attention_mask=attention_mask)
                 logits = outputs.logits
