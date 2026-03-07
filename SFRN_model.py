@@ -51,7 +51,7 @@ class SFRNModel(nn.Module):
         outputs = self.bert(input_ids.squeeze(), attention_mask=attention_mask.squeeze())
 
         # take the pooled output from BERT (represents the entire input sequence)
-        pooled_output = outputs[-1]
+        pooled_output = outputs[0]
 
         # apply dropout to pooled output
         pooled_output = self.dropout(pooled_output)
@@ -63,10 +63,10 @@ class SFRNModel(nn.Module):
         g_t = self.alpha(g_t) * g_t + self.beta(g_t)
 
         # sum across all features to create a condensed representation
-        g = g_t.sum(0)
+        g = g_t.sum(1)
 
         # pass through the final MLP (f) to get the output logits
-        output = self.f(g.unsqueeze(0))
+        output = self.f(g)
 
         # apply softmax to get probability distributions over the classes
         logits = torch.softmax(output, dim=1)
