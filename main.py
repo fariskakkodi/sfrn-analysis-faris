@@ -1,6 +1,7 @@
 import argparse
 #import wandb
 import os
+import csv
 import random
 from tqdm.auto import tqdm
 import numpy as np
@@ -37,7 +38,7 @@ def train(args):
     model_name = hyperparameters['model_name']
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    # load the training and testing datasets
+    # load the training, validation, and testing datasets
     train_dataset = SequenceDataset(TRAIN_FILE_PATH, tokenizer, DEVICE)
     val_dataset = SequenceDataset(VAL_FILE_PATH, tokenizer, DEVICE)
     test_dataset = SequenceDataset(TEST_FILE_PATH, tokenizer, DEVICE)
@@ -103,7 +104,6 @@ def train(args):
         val_iterator = tqdm(val_loader, desc="Validation Iteration")
         with torch.no_grad():
             for step, batch in enumerate(val_iterator):
-                # extract input and labels from the batch
                 input_ids = batch["input_ids"].to(DEVICE)
                 attention_mask = batch["attention_mask"].to(DEVICE)
                 labels = batch["label"].to(DEVICE)
@@ -135,6 +135,7 @@ def train(args):
         model.load_state_dict(torch.load(best_ckp_path, map_location=DEVICE))
         model.eval()
         test_y_true, test_y_pred = [], []
+        test_questions, test_universities = [], []
         test_iterator = tqdm(test_loader, desc="Test Iteration")
         with torch.no_grad():
             for batch in test_iterator:
@@ -148,11 +149,29 @@ def train(args):
                 test_y_true.extend(labels.cpu().numpy())
                 test_y_pred.extend(pred_idx.cpu().numpy())
 
+                # collect question and university for output file
+                test_questions.extend(batch["question"])
+                test_universities.extend(batch["university"])
+
         # calculate and print test metrics
         test_acc = accuracy_score(test_y_true, test_y_pred)
         test_f1 = f1_score(test_y_true, test_y_pred, average='macro')
         test_qwk = cohen_kappa_score(test_y_true, test_y_pred, weights='quadratic')
         print(f'Test - Acc: {test_acc:.4f}, F1: {test_f1:.4f}, QWK: {test_qwk:.4f}')
+
+        # write test output CSV with question, university, true label, predicted label
+        output_path = './test_output.csv'
+        with open(output_path, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['question', 'university', 'true_label', 'predicted_label'])
+            writer.writeheader()
+            for q, univ, true, pred in zip(test_questions, test_universities, test_y_true, test_y_pred):
+                writer.writerow({
+                    'question': q,
+                    'university': univ,
+                    'true_label': true,
+                    'predicted_label': pred,
+                })
+        print(f'Test output saved to {output_path}')
 
 
 def main():
