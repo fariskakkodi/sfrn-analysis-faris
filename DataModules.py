@@ -20,13 +20,15 @@ class SequenceDataset(Dataset):
                     label = str(row["ground_truth"]).strip()
                     question_text = str(row["Question"]).strip()
                     reference_answer = str(row["Model_Answer"]).strip()
+                    rubric = str(row["Rubric"]).strip()
 
                     identifier = str(row["TaskPrompt"]).strip() if "TaskPrompt" in row and row["TaskPrompt"] else "NA"
 
                     # store university and question for output file
                     university = str(row["UNIV"]).strip() if "UNIV" in row and row["UNIV"] else "NA"
 
-                    line = CLS_TOKEN + student_answer + SEP_TOKEN + reference_answer + SEP_TOKEN + question_text
+                    # include rubric as an additional feature
+                    line = CLS_TOKEN + student_answer + SEP_TOKEN + reference_answer + SEP_TOKEN + question_text + SEP_TOKEN + rubric
 
                     self.label_set.add(label)
                     self.data_dict.append({
@@ -68,7 +70,7 @@ class SequenceDataset(Dataset):
             "identifier": identifier,
             "question": question,
             "university": university,
-            "task_prompt": identifier
+            "task_prompt": identifier,
         }
 
     def get_category_distribution(self):
