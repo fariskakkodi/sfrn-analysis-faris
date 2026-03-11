@@ -150,7 +150,7 @@ def train(args):
                 test_y_pred.extend(pred_idx.cpu().numpy())
 
                 # collect question and university for output file
-                test_questions.extend(batch["question"])
+                test_questions.extend(batch["task_prompt"])
                 test_universities.extend(batch["university"])
 
         # calculate and print test metrics
