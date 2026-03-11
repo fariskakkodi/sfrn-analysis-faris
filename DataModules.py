@@ -68,6 +68,7 @@ class SequenceDataset(Dataset):
             "identifier": identifier,
             "question": question,
             "university": university,
+            "task_prompt": identifier
         }
 
     def get_category_distribution(self):
