@@ -48,7 +48,7 @@ class SFRNModel(nn.Module):
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None):
         # pass input through BERT to get contextualized embeddings
-        outputs = self.bert(input_ids.squeeze(), attention_mask=attention_mask.squeeze())
+        outputs = self.bert(input_ids.squeeze(0), attention_mask=attention_mask.squeeze(0))
 
         # take the pooled output from BERT (represents the entire input sequence)
         pooled_output = outputs[0]
