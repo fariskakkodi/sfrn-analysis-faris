@@ -12,9 +12,9 @@ YituTech/conv-bert-base
 #TRAIN_FILE_PATH = ['./data/debug.csv']
 #TEST_FILE_PATH = ['./data/debug.csv']
 
-TRAIN_FILE_PATH = ['./data/train_new_data.csv']
-TEST_FILE_PATH = ['./data/test_new_data.csv']
-VAL_FILE_PATH = ['./data/validation_new_data.csv']
+TRAIN_FILE_PATH = ['./data/train_new_data_final.csv']
+TEST_FILE_PATH = ['./data/test_new_data_final.csv']
+VAL_FILE_PATH = ['./data/validation_new_data_final.csv']
 
 ### CHANGE: added path to istudio_dict_init.py ###
 #ISTUDIO_DATA_DICTS = ['./data/smk6961/ASAG/istudio_dict_init.py']
