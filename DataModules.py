@@ -28,7 +28,7 @@ class SequenceDataset(Dataset):
                     university = str(row["UNIV"]).strip() if "UNIV" in row and row["UNIV"] else "NA"
 
                     # include rubric as an additional feature
-                    line = CLS_TOKEN + student_answer + SEP_TOKEN + reference_answer
+                    line = CLS_TOKEN + question_text + SEP_TOKEN + student_answer + SEP_TOKEN + reference_answer + SEP_TOKEN + rubric
 
                     self.label_set.add(label)
                     self.data_dict.append({
