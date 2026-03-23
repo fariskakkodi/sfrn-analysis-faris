@@ -7,7 +7,8 @@ class SFRNModel(nn.Module):
     def __init__(self):
         super(SFRNModel, self).__init__()
         # load the pre-trained BERT model for feature extraction
-        self.bert = AutoModel.from_pretrained(hyperparameters['model_name'])
+        #self.bert = AutoModel.from_pretrained(hyperparameters['model_name'])
+        self.encoder = AutoModel.from_pretrained(hyperparameters['model_name'])
 
         # dropout layer for regularization to reduce overfitting
         self.dropout = torch.nn.Dropout(hyperparameters['hidden_dropout_prob'])
@@ -50,7 +51,10 @@ class SFRNModel(nn.Module):
         # pass input through BERT to get contextualized embeddings
         input_ids = input_ids[0] if isinstance(input_ids, tuple) else input_ids
         attention_mask = attention_mask[0] if isinstance(attention_mask, tuple) else attention_mask
-        outputs = self.bert(input_ids, attention_mask=attention_mask)
+        #outputs = self.bert(input_ids, attention_mask=attention_mask)
+        global_attention_mask = torch.zeros_like(input_ids)
+        global_attention_mask[:, 0] = 1  # global attention on [CLS] / <s> token
+        outputs = self.encoder(input_ids, attention_mask=attention_mask, global_attention_mask=global_attention_mask)
 
         # take the pooled output from BERT (represents the entire input sequence)
         pooled_output = outputs[0]
