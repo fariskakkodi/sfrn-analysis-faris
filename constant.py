@@ -18,8 +18,11 @@ VAL_FILE_PATH = ['./data/validation_new_data.csv']
 
 ### CHANGE: added path to istudio_dict_init.py ###
 #ISTUDIO_DATA_DICTS = ['./data/smk6961/ASAG/istudio_dict_init.py']
-SEP_TOKEN = '[SEP]'
-CLS_TOKEN = '[CLS]'
+#SEP_TOKEN = '[SEP]' #BERT
+#CLS_TOKEN = '[CLS]' #BERT
+
+SEP_TOKEN = '</s>'
+CLS_TOKEN = '<s>'
 
 TAG2ID = {'0': 0, '1': 1, '2': 2}
 
