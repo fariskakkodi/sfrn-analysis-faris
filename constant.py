@@ -25,9 +25,11 @@ TAG2ID = {'0': 0, '1': 1, '2': 2}
 
 hyperparameters = dict(
     train_id="0204_IS_SFRN_pretrain_model",
-    model_name="bert-base-uncased",
+    #model_name="bert-base-uncased", #Bert
+    model_name="allenai/longformer-base-4096",
     num_labels = 3,
-    max_length = 128,
+    #max_length = 128, #Bert
+    max_length = 4096
     random_seed=23, # 23， 123
     data_split=0.2,
     lr=1e-6,
