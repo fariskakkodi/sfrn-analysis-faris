@@ -57,7 +57,8 @@ class SFRNModel(nn.Module):
         outputs = self.encoder(input_ids, attention_mask=attention_mask, global_attention_mask=global_attention_mask)
 
         # take the pooled output from BERT (represents the entire input sequence)
-        pooled_output = outputs[0]
+        #pooled_output = outputs[0]
+        pooled_output = outputs[0][:, 0, :]
 
         # apply dropout to pooled output
         pooled_output = self.dropout(pooled_output)
@@ -69,7 +70,8 @@ class SFRNModel(nn.Module):
         g_t = self.alpha(g_t) * g_t + self.beta(g_t)
 
         # sum across all features to create a condensed representation
-        g = g_t.sum(1)
+        #g = g_t.sum(1)
+        g = g_t
 
         # pass through the final MLP (f) to get the output logits
         output = self.f(g)
