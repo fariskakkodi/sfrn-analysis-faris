@@ -165,7 +165,7 @@ def train(args):
         with open(output_path, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=['response_id', 'question', 'university', 'true_label', 'predicted_label'])
             writer.writeheader()
-            for q, univ, true, pred in zip(test_response_ids, test_questions, test_universities, test_y_true, test_y_pred):
+            for rid, q, univ, true, pred in zip(test_response_ids, test_questions, test_universities, test_y_true, test_y_pred):
                 writer.writerow({
                     'response_id': rid,
                     'question': q,
