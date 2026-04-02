@@ -136,6 +136,7 @@ def train(args):
         model.eval()
         test_y_true, test_y_pred = [], []
         test_questions, test_universities = [], []
+        test_response_ids = []
         test_iterator = tqdm(test_loader, desc="Test Iteration")
         with torch.no_grad():
             for batch in test_iterator:
@@ -148,7 +149,7 @@ def train(args):
                 pred_idx = torch.argmax(logits, dim=1)
                 test_y_true.extend(labels.cpu().numpy())
                 test_y_pred.extend(pred_idx.cpu().numpy())
-
+                test_response_ids.extend(batch["response_id"])
                 # collect question and university for output file
                 test_questions.extend(batch["task_prompt"])
                 test_universities.extend(batch["university"])
@@ -162,10 +163,11 @@ def train(args):
         # write test output CSV with question, university, true label, predicted label
         output_path = './longformer_q+a+m.csv'
         with open(output_path, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=['question', 'university', 'true_label', 'predicted_label'])
+            writer = csv.DictWriter(csvfile, fieldnames=['response_id', 'question', 'university', 'true_label', 'predicted_label'])
             writer.writeheader()
-            for q, univ, true, pred in zip(test_questions, test_universities, test_y_true, test_y_pred):
+            for q, univ, true, pred in zip(test_response_ids, test_questions, test_universities, test_y_true, test_y_pred):
                 writer.writerow({
+                    'response_id': rid,
                     'question': q,
                     'university': univ,
                     'true_label': true,
