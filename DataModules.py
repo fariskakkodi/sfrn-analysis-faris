@@ -16,6 +16,7 @@ class SequenceDataset(Dataset):
                 csv_reader = csv.DictReader(csvfile)
 
                 for row in csv_reader:
+                    response_id = str(row["ResponseId"]).strip() if "ResponseId" in row and row["ResponseId"] else "NA"
                     student_answer = str(row["ResponseText.x"]).strip()
                     label = str(row["ground_truth"]).strip()
                     question_text = str(row["Question"]).strip()
@@ -37,6 +38,7 @@ class SequenceDataset(Dataset):
                         "identifier": identifier,
                         "question": question_text,
                         "university": university,
+                        "response_id": response_id,   # ADD THIS
                     })
 
         print(self.tag2id)
@@ -52,6 +54,8 @@ class SequenceDataset(Dataset):
         identifier = item["identifier"]
         question = item["question"]
         university = item["university"]
+        response_id = item["response_id"]
+
 
         tokenized_data = self.tokenizer(
             line,
@@ -71,6 +75,7 @@ class SequenceDataset(Dataset):
             "question": question,
             "university": university,
             "task_prompt": identifier,
+            "response_id": response_id,   # ADD THIS
         }
 
     def get_category_distribution(self):
