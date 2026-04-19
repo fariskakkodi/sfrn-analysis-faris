@@ -109,7 +109,7 @@ def train(args):
             "train_acc": train_acc,
             "train_f1": train_f1,
             "train_qwk": train_qwk,
-        }, step=epoch)
+        })
 
         # validation loop
         model.eval()
@@ -141,7 +141,7 @@ def train(args):
                 "val_acc": val_acc,
                 "val_f1": val_f1,
                 "val_qwk": val_qwk,
-            }, step=epoch)
+            })
 
             # save best model checkpoint
             if val_acc > best_acc or val_f1 > best_f1:
@@ -181,13 +181,10 @@ def train(args):
         test_qwk = cohen_kappa_score(test_y_true, test_y_pred, weights='quadratic')
         print(f'Test - Acc: {test_acc:.4f}, F1: {test_f1:.4f}, QWK: {test_qwk:.4f}')
 
-        wandb.run.summary["best_val_f1"] = best_f1
-        wandb.run.summary["best_val_acc"] = best_acc
         wandb.run.summary["test_acc"] = test_acc
         wandb.run.summary["test_f1"] = test_f1
         wandb.run.summary["test_qwk"] = test_qwk
 
-        wandb.finish()
 
         # write test output CSV with question, university, true label, predicted label
         output_path = './sfrn+longformer_a+m.csv'
@@ -203,7 +200,9 @@ def train(args):
                     'predicted_label': pred,
                 })
         print(f'Test output saved to {output_path}')
-
+    wandb.run.summary["best_val_f1"] = best_f1
+    wandb.run.summary["best_val_acc"] = best_acc
+    wandb.finish()
 
 def main():
     # parse command-line arguments for model checkpoint and device
