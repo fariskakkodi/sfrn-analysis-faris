@@ -15,12 +15,18 @@ from torch.optim import AdamW
 from constant import *
 from DataModules import SequenceDataset
 from SFRN_model import SFRNModel  # import the custom SFRN model
+import wandb
+from constant import PROJECT_NAME, ENTITY
 
 best_ckp_path = None  # global variable for saving the best checkpoint path
 
 
 def train(args):
     # define the directory for saving checkpoints
+    wandb.init(project=PROJECT_NAME, entity=ENTITY, config=hyperparameters)
+    for key in wandb.config.keys():
+        hyperparameters[key] = wandb.config[key]
+
     checkpoint_dir = './checkpoints'
 
     # set a random seed for reproducibility
@@ -97,6 +103,14 @@ def train(args):
         train_qwk = cohen_kappa_score(y_true, y_pred, weights='quadratic')
         print(f'Epoch {epoch + 1} - Loss: {train_loss:.4f} - Train Acc: {train_acc:.4f} - Train F1: {train_f1:.4f}')
 
+        wandb.log({
+            "epoch": epoch + 1,
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "train_f1": train_f1,
+            "train_qwk": train_qwk,
+        }, step=epoch)
+
         # validation loop
         model.eval()
         val_loss = 0.0
@@ -121,6 +135,13 @@ def train(args):
             val_f1 = f1_score(val_y_true, val_y_pred, average='macro')
             val_qwk = cohen_kappa_score(val_y_true, val_y_pred, weights='quadratic')
             print(f'Validation - Acc: {val_acc:.4f}, F1: {val_f1:.4f}, Loss: {val_loss:.4f}')
+
+            wandb.log({
+                "val_loss": val_loss,
+                "val_acc": val_acc,
+                "val_f1": val_f1,
+                "val_qwk": val_qwk,
+            }, step=epoch)
 
             # save best model checkpoint
             if val_acc > best_acc or val_f1 > best_f1:
@@ -159,6 +180,14 @@ def train(args):
         test_f1 = f1_score(test_y_true, test_y_pred, average='macro')
         test_qwk = cohen_kappa_score(test_y_true, test_y_pred, weights='quadratic')
         print(f'Test - Acc: {test_acc:.4f}, F1: {test_f1:.4f}, QWK: {test_qwk:.4f}')
+
+        wandb.run.summary["best_val_f1"] = best_f1
+        wandb.run.summary["best_val_acc"] = best_acc
+        wandb.run.summary["test_acc"] = test_acc
+        wandb.run.summary["test_f1"] = test_f1
+        wandb.run.summary["test_qwk"] = test_qwk
+
+        wandb.finish()
 
         # write test output CSV with question, university, true label, predicted label
         output_path = './sfrn+longformer_a+m.csv'
