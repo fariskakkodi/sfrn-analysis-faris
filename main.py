@@ -23,9 +23,22 @@ best_ckp_path = None  # global variable for saving the best checkpoint path
 
 def train(args):
     # define the directory for saving checkpoints
-    wandb.init(project=PROJECT_NAME, entity=ENTITY, config=hyperparameters)
-    for key in wandb.config.keys():
-        hyperparameters[key] = wandb.config[key]
+    run = wandb.init(project=PROJECT_NAME, entity=ENTITY)
+
+    config = wandb.config
+
+    hyperparameters = {
+        "random_seed": getattr(config, "random_seed", 42),
+        "model_name": getattr(config, "model_name", "allenai/longformer-base-4096"),
+        "lr": getattr(config, "lr", 1e-6),
+        "weight_decay": getattr(config, "weight_decay", 0.01),
+        "epochs": getattr(config, "epochs", 3),
+        "WARMUP_STEPS": getattr(config, "WARMUP_STEPS", 0.1),
+        "GRADIENT_ACCUMULATION_STEPS": getattr(config, "GRADIENT_ACCUMULATION_STEPS", 1),
+        "max_norm": getattr(config, "max_norm", 1),
+        "hidden_dropout_prob": getattr(config, "hidden_dropout_prob", 0.1),
+        "mlp_hidden": getattr(config, "mlp_hidden", 128),
+    }
 
     checkpoint_dir = './checkpoints'
 
