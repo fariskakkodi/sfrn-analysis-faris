@@ -30,16 +30,16 @@ def train(args):
     hyperparameters = {
         "random_seed": getattr(config, "random_seed", 42),
         "model_name": getattr(config, "model_name", "allenai/longformer-base-4096"),
-        "lr": getattr(config, "lr", 1e-6),
+        "lr": getattr(config, "lr", 1.059e-05),           # was 1e-6
         "weight_decay": getattr(config, "weight_decay", 0.01),
-        "epochs": getattr(config, "epochs", 8),
-        "WARMUP_STEPS": getattr(config, "WARMUP_STEPS", 0.1),
-        "GRADIENT_ACCUMULATION_STEPS": getattr(config, "GRADIENT_ACCUMULATION_STEPS", 1),
-        "max_norm": getattr(config, "max_norm", 1),
+        "epochs": getattr(config, "epochs", 8),            # was 3 ← the main culprit
+        "WARMUP_STEPS": getattr(config, "WARMUP_STEPS", 0.05),   # was 0.1
+        "GRADIENT_ACCUMULATION_STEPS": getattr(config, "GRADIENT_ACCUMULATION_STEPS", 2),  # was 1
+        "max_norm": getattr(config, "max_norm", 5),        # was 1
         "hidden_dropout_prob": getattr(config, "hidden_dropout_prob", 0.1),
-        "mlp_hidden": getattr(config, "mlp_hidden", 128),
+        "mlp_hidden": getattr(config, "mlp_hidden", 256),  # was 128
     }
-
+    
     checkpoint_dir = './checkpoints'
 
     # set a random seed for reproducibility
