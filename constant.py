@@ -36,11 +36,11 @@ hyperparameters = dict(
     random_seed=23, # 23， 123
     data_split=0.2,
     lr=1e-6,
-    epochs=3,
+    epochs=8,
     weight_decay=0.01,
-    max_norm = 1, 
+    max_norm = 5, 
     WARMUP_STEPS=0.05,
-    hidden_dropout_prob=0.2,
+    hidden_dropout_prob=0.1,
     GRADIENT_ACCUMULATION_STEPS = 2,
     # model
     hidden_dim=768, # 768
