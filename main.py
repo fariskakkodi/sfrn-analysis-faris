@@ -32,7 +32,7 @@ def train(args):
         "model_name": getattr(config, "model_name", "allenai/longformer-base-4096"),
         "lr": getattr(config, "lr", 1e-6),
         "weight_decay": getattr(config, "weight_decay", 0.01),
-        "epochs": getattr(config, "epochs", 3),
+        "epochs": getattr(config, "epochs", 8),
         "WARMUP_STEPS": getattr(config, "WARMUP_STEPS", 0.1),
         "GRADIENT_ACCUMULATION_STEPS": getattr(config, "GRADIENT_ACCUMULATION_STEPS", 1),
         "max_norm": getattr(config, "max_norm", 1),
