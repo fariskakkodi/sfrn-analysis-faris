@@ -200,7 +200,7 @@ def train(args):
 
 
         # write test output CSV with question, university, true label, predicted label
-        output_path = './wb_sfrn+longformer_q+a+m.csv'
+        output_path = './wb_sfrn+longformer_q+a+m_sweep.csv'
         with open(output_path, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=['response_id', 'question', 'university', 'true_label', 'predicted_label'])
             writer.writeheader()
