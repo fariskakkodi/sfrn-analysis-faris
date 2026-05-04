@@ -31,7 +31,8 @@ class SequenceDataset(Dataset):
                     # include rubric as an additional feature
                     #line = CLS_TOKEN + student_answer + SEP_TOKEN + reference_answer #+ SEP_TOKEN + rubric question_text + SEP_TOKEN
                     #line = CLS_TOKEN + question_text + SEP_TOKEN + student_answer + SEP_TOKEN + reference_answer
-                    line = CLS_TOKEN + question_text + SEP_TOKEN + student_answer + SEP_TOKEN + reference_answer + SEP_TOKEN + rubric
+                    #line = CLS_TOKEN + question_text + SEP_TOKEN + student_answer + SEP_TOKEN + reference_answer + SEP_TOKEN + rubric
+                    line = CLS_TOKEN + question_text + SEP_TOKEN + student_answer + SEP_TOKEN + reference_answer
 
 
                     self.label_set.add(label)
